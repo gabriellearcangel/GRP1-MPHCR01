@@ -1,0 +1,114 @@
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.time.LocalDate;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+
+public class PayrollGUI extends JFrame {
+    private JTextField hourlyRateField;
+    private JTextField weekHrsField;
+    private JTextField periodStartField;
+    private JTextField periodEndField;
+    private JTextArea resultArea;
+
+    public PayrollGUI() {
+        setTitle("Payroll System");
+        setSize(500, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout(10, 10));
+
+        // Input Panel
+        JPanel inputPanel = new JPanel(new GridLayout(4, 2, 5, 5));
+        inputPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        inputPanel.add(new JLabel("Hourly Rate:"));
+        hourlyRateField = new JTextField();
+        inputPanel.add(hourlyRateField);
+
+        inputPanel.add(new JLabel("Weekly Hours:"));
+        weekHrsField = new JTextField();
+        inputPanel.add(weekHrsField);
+
+        inputPanel.add(new JLabel("Period Start (YYYY-MM-DD):"));
+        periodStartField = new JTextField();
+        inputPanel.add(periodStartField);
+
+        inputPanel.add(new JLabel("Period End (YYYY-MM-DD):"));
+        periodEndField = new JTextField();
+        inputPanel.add(periodEndField);
+
+        // Button
+        JButton calculateButton = new JButton("Calculate Payroll");
+        calculateButton.addActionListener(new CalculateListener());
+
+        // Result Area
+        resultArea = new JTextArea();
+        resultArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(resultArea);
+
+        // Add components to frame
+        add(inputPanel, BorderLayout.NORTH);
+        add(calculateButton, BorderLayout.CENTER);
+        add(scrollPane, BorderLayout.SOUTH);
+    }
+
+    private class CalculateListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                double hourlyRate = Double.parseDouble(hourlyRateField.getText());
+                double weekHrs = Double.parseDouble(weekHrsField.getText());
+                LocalDate periodStart = LocalDate.parse(periodStartField.getText());
+                LocalDate periodEnd = LocalDate.parse(periodEndField.getText());
+
+                Payroll payroll = new Payroll(hourlyRate, weekHrs, periodStart, periodEnd);
+                payroll.computeNet();
+
+                // Format results
+                String result = String.format(
+                    "=== Payroll Calculation ===\n" +
+                    "Period: %s to %s\n" +
+                    "Hourly Rate: ₱%.2f\n" +
+                    "Weekly Hours: %.2f\n\n" +
+                    "Gross Pay: ₱%.2f\n\n" +
+                    "Deductions:\n" +
+                    "  SSS: ₱%.2f\n" +
+                    "  Pag-IBIG: ₱%.2f\n" +
+                    "  PhilHealth: ₱%.2f\n" +
+                    "  Total Deductions: ₱%.2f\n\n" +
+                    "Net Pay: ₱%.2f",
+                    payroll.getPeriodStart(), payroll.getPeriodEnd(),
+                    payroll.getHourlyRate(), payroll.getWeekHrs(),
+                    payroll.getGrossPay(),
+                    payroll.getDedSSS(), payroll.getDedPagibig(), payroll.getDedPhilhealth(),
+                    payroll.getSumDed(),
+                    payroll.getNetPay()
+                );
+
+                resultArea.setText(result);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(PayrollGUI.this, 
+                    "Invalid input! Please check your values.\n" + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            PayrollGUI gui = new PayrollGUI();
+            gui.setVisible(true);
+        });
+    }
+}
+

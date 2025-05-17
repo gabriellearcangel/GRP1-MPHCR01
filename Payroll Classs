@@ -1,0 +1,59 @@
+import java.time.LocalDate;
+
+public class Payroll {
+    public static void main(String[] args) {
+        
+    }
+    private double grossPay;
+    private double netPay;
+    private double hourlyRate;
+    private double weekHrs;
+    private double dedSSS;
+    private double dedPagibig;
+    private double dedPhilhealth;
+    private double sumDed;
+    private LocalDate periodStart;
+    private LocalDate periodEnd;
+
+    public Payroll(double hourlyRate, double weekHrs, LocalDate periodStart, LocalDate periodEnd) {
+        this.hourlyRate = hourlyRate;
+        this.weekHrs = weekHrs;
+        this.periodStart = periodStart;
+        this.periodEnd = periodEnd;
+    }
+
+    public double computeGross() {
+        grossPay = hourlyRate * weekHrs;
+        return grossPay;
+    }
+
+    public double totalDed() {
+        // Sample computation  
+        dedSSS = grossPay * 0.045; // 4.5% of gross
+        dedPagibig = 100.0; // Fixed amount
+        dedPhilhealth = grossPay * 0.025; // 2.5% of gross
+        sumDed = dedSSS + dedPagibig + dedPhilhealth;
+        return sumDed;
+    }
+
+    public double computeNet() {
+        computeGross();
+        totalDed();
+        netPay = grossPay - sumDed;
+        return netPay;
+    }
+
+    // Getters for all fields
+    public double getGrossPay() { return grossPay; }
+    public double getNetPay() { return netPay; }
+    public double getHourlyRate() { return hourlyRate; }
+    public double getWeekHrs() { return weekHrs; }
+    public double getDedSSS() { return dedSSS; }
+    public double getDedPagibig() { return dedPagibig; }
+    public double getDedPhilhealth() { return dedPhilhealth; }
+    public double getSumDed() { return sumDed; }
+    public LocalDate getPeriodStart() { return periodStart; }
+    public LocalDate getPeriodEnd() { return periodEnd; }
+}
+    
+
